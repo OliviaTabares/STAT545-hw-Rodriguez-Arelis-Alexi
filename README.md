@@ -5,6 +5,7 @@ Hello TA's/Instructor,
 
 This is my repository for Homework 1.
 
+<<<<<<< HEAD
 I made all the changes using my repository local version on RStudio, i.e.: pull, edit locally, save, commit, push to github.com.
 
 Now, I'm trying some features on the README file:
@@ -31,6 +32,9 @@ get.N.RMSE <- function(results, Type ,Approach, Software)
 
 
 [Link to the main STAT545 webpage: ](http://stat545.com)
+=======
+[Link to the main STAT545 webpage.](http://stat545.com)
+>>>>>>> 4c8a92254cf9e0375cf160bb4d63628f76dd229e
 
 
 
