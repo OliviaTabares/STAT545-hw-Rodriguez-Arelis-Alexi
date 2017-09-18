@@ -15,7 +15,7 @@ Now, I'm trying some features on the README file:
   + Nested bullets.
     * Even more nested.
     
-This a function I usually use for handling my simulation databases:
+This a function I use for handling my simulation databases:
 ```R
 get.N.RMSE <- function(results, Type ,Approach, Software)
 {
