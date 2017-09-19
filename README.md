@@ -47,8 +47,7 @@ Furthermore, the `.md` file for the Gapminder exploration is a really useful too
 
 - [Link to the `md` file for Gapminder exploration.](hw1_gapminder.md)
 
-
-31940019389138f99fec9f4ab66e946975010ea4
+- SHA: alexrod61@31940019389138f99fec9f4ab66e946975010ea4
 
 Cheers,
 
