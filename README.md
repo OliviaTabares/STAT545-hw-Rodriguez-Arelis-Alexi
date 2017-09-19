@@ -14,6 +14,8 @@ Now, I'm trying some features on the README file:
 - ~~Strikeout.~~
   + Nested bullets.
     * Even more nested.
+
+### My R Code
     
 This a function I use for handling my simulation databases:
 ```R
@@ -27,6 +29,13 @@ get.N.RMSE <- function(results, Type ,Approach, Software)
   return(results)
 }
 ```
+
+### Image
+
+
+![alt text](f_function_2d.pdf "2-d Franke's Function")
+
+### Link
 
 [Link to the main STAT545 webpage.](http://stat545.com)
 
