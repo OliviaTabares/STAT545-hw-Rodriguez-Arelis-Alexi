@@ -60,4 +60,4 @@ boxplot(lifeExp ~ continent, data = gapminder, main = "Distribution of Life Expe
 
 ![](hw1_gapminder_files/figure-markdown_github-ascii_identifiers/unnamed-chunk-5-1.png)
 
-We can see important differences in medians and spread from one continent to another.
+We can see important differences in medians and spreads from one continent to another.

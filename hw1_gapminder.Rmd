@@ -40,4 +40,4 @@ Finally, we can get side-by-side boxplots for Life Expectancy across all contine
 boxplot(lifeExp ~ continent, data = gapminder, main = "Distribution of Life Expectancy across All Continents")
 ```
 
-We can see important differences in medians and spread from one continent to another.
+We can see important differences in medians and spreads from one continent to another.
