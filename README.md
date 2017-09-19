@@ -32,8 +32,7 @@ get.N.RMSE <- function(results, Type ,Approach, Software)
 
 ### Image
 
-
-![alt text](f_function_2d.pdf "2-d Franke's Function")
+![alt text](f_function_2d.png "2-d Franke's Function")
 
 ### Link
 
