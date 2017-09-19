@@ -37,7 +37,7 @@ get.N.RMSE <- function(results, Type ,Approach, Software)
 
 ### Reflections on the GitHub Workflow and R Markdown
 
-The workflow went smoothly through all the assignment. I didn't have any issues when pulling, committing and pushing while I was editting the files locally.
+The workflow went smoothly throughout all the assignment. I didn't have any issues when pulling, committing and pushing while I was editting the files locally.
 
 Furthermore, the `.md` file for the Gapminder exploration is a really useful tool for `R` outputs.
 
