@@ -5,7 +5,7 @@ date: "18/9/2017"
 output: github_document
 ---
 
-# Dataset Explorations
+# Dataset Exploration
 
 First of all, we need to load the dataset:
 
@@ -13,36 +13,23 @@ First of all, we need to load the dataset:
 library(gapminder)
 ```
 
-Now, we can examine the first 6 rows of the dataset:
+Now, we can examine the **first** 6 rows of the dataset:
 
 ```{r}
 head(gapminder)
 ```
 
-As well as the last 6 rows:
+As well as the **last** 6 rows:
 
 ```{r}
 tail(gapminder)
 ```
 
+We can also get summaries for a specific variable as in:
 
-
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+```{r}
+# Disabling scientific notation
+options(scipen = 999)
+# Summary for Population
+summary(gapminder$pop)
 ```
-
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

@@ -3,8 +3,8 @@ HW1 - Gapminder Exploration
 Alexi Rodriguez-Arelis
 18/9/2017
 
-Dataset Explorations
-====================
+Dataset Exploration
+===================
 
 First of all, we need to load the dataset:
 
@@ -12,7 +12,7 @@ First of all, we need to load the dataset:
 library(gapminder)
 ```
 
-Now, we can examine the first 6 rows of the dataset:
+Now, we can examine the **first** 6 rows of the dataset:
 
 ``` r
 head(gapminder)
@@ -26,7 +26,7 @@ head(gapminder)
     ## 5 Afghanistan      Asia 1972  36.088 13079460  739.9811
     ## 6 Afghanistan      Asia 1977  38.438 14880372  786.1134
 
-As well as the last 6 rows:
+As well as the **last** 6 rows:
 
 ``` r
 tail(gapminder)
@@ -40,30 +40,14 @@ tail(gapminder)
     ## 1703 Zimbabwe    Africa 2002  39.989 11926563  672.0386
     ## 1704 Zimbabwe    Africa 2007  43.487 12311143  469.7093
 
-R Markdown
-----------
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+We can also get summaries for a specific variable as in:
 
 ``` r
-summary(cars)
+# Disabling scientific notation
+options(scipen = 999)
+# Summary for Population
+summary(gapminder$pop)
 ```
 
-    ##      speed           dist       
-    ##  Min.   : 4.0   Min.   :  2.00  
-    ##  1st Qu.:12.0   1st Qu.: 26.00  
-    ##  Median :15.0   Median : 36.00  
-    ##  Mean   :15.4   Mean   : 42.98  
-    ##  3rd Qu.:19.0   3rd Qu.: 56.00  
-    ##  Max.   :25.0   Max.   :120.00
-
-Including Plots
----------------
-
-You can also embed plots, for example:
-
-![](hw1_gapminder_files/figure-markdown_github-ascii_identifiers/pressure-1.png)
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+    ##       Min.    1st Qu.     Median       Mean    3rd Qu.       Max. 
+    ##      60011    2793664    7023596   29601212   19585222 1318683096
