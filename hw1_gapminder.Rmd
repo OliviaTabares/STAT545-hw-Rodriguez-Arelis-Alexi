@@ -33,3 +33,11 @@ options(scipen = 999)
 # Summary for Population
 summary(gapminder$pop)
 ```
+
+Finally, we can get side-by-side boxplots for Life Expectancy across all continents:
+
+```{r}
+boxplot(lifeExp ~ continent, data = gapminder, main = "Distribution of Life Expectancy across All Continents")
+```
+
+We can see important differences in medians and spread from one continent to another.

@@ -51,3 +51,13 @@ summary(gapminder$pop)
 
     ##       Min.    1st Qu.     Median       Mean    3rd Qu.       Max. 
     ##      60011    2793664    7023596   29601212   19585222 1318683096
+
+Finally, we can get side-by-side boxplots for Life Expectancy across all continents:
+
+``` r
+boxplot(lifeExp ~ continent, data = gapminder, main = "Distribution of Life Expectancy across All Continents")
+```
+
+![](hw1_gapminder_files/figure-markdown_github-ascii_identifiers/unnamed-chunk-5-1.png)
+
+We can see important differences in medians and spread from one continent to another.
