@@ -40,7 +40,7 @@ tail(gapminder)
     ## 1703 Zimbabwe    Africa 2002  39.989 11926563  672.0386
     ## 1704 Zimbabwe    Africa 2007  43.487 12311143  469.7093
 
-We can also get summaries for a specific variable as in:
+We can also get summaries for a specific variable (`pop`) as in:
 
 ``` r
 # Disabling scientific notation
@@ -52,7 +52,7 @@ summary(gapminder$pop)
     ##       Min.    1st Qu.     Median       Mean    3rd Qu.       Max. 
     ##      60011    2793664    7023596   29601212   19585222 1318683096
 
-Finally, we can get side-by-side boxplots for Life Expectancy across all continents:
+Finally, we can get side-by-side boxplots for Life Expectancy (`lifeExp`) across all continents:
 
 ``` r
 boxplot(lifeExp ~ continent, data = gapminder, main = "Distribution of Life Expectancy across All Continents")
