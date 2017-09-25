@@ -1,4 +1,4 @@
-# STAT545-hw01-Rodriguez-Arelis-Alexi
+# STAT545-hw-Rodriguez-Arelis-Alexi
 # Homework 01: Edit README.md and Use R Markdown
 
 Hello TA's/Instructor,
