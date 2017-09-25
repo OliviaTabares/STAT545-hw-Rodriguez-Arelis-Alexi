@@ -45,7 +45,7 @@ Furthermore, the `.md` file for the Gapminder exploration is a really useful too
 
 - [Main STAT545 webpage.](http://stat545.com)
 
-- [Link to the `md` file for Gapminder exploration.](hw1_gapminder.md)
+- [Link to the `md` file for Gapminder exploration.](hw01/hw1_gapminder.md)
 
 Cheers,
 
