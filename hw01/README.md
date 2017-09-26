@@ -1,7 +1,7 @@
 # STAT545-hw01-Rodriguez-Arelis-Alexi
-# Homework 01: Explore `Gapminder` and use `dplyr`
+# Homework 01: Edit `README.md` and Use R Markdown
 
-This is the folder corresponding to for Homework 2.
+This is the folder corresponding to Homework 1.
 
 I made all the changes using my repository local version on RStudio, i.e.: pull, edit locally, save, commit, push to github.com.
 

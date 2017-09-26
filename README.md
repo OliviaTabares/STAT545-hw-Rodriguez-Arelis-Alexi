@@ -3,7 +3,7 @@
 
 Hello TA's/Instructor,
 
-This is my repository for STAT545 Homeworks.
+This is my repository for STAT545 homeworks.
 
 The following sections provide the respective links to the `README.md` files for each homework.
 
