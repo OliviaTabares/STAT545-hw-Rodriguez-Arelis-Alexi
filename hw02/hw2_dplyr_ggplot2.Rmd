@@ -16,7 +16,6 @@ First of all, we need to load the corresponding libraries.
 ```{r}
 library(gapminder)
 library(tidyverse)
-library(ggplot2)
 ```
 
 ## Smell Test the Data
@@ -92,10 +91,10 @@ Function `summary()` provides the range of this quantitative variable, as well a
 boxplot(gdpPercap ~ year, data = gapminder, main = "Global Evolution of Gross Domestic Product over Time \n", xlab = "Year", ylab = "Gross Domestic Product per Capita")
 ```
 
-Function `boxplot()` provides "not so cool" side-by-side boxplots, unlike `ggplot2`. Although, we can see that as time goes by the spread gets larger and larger. This suggests that there might be differences in `gdpPercap`, if we explore the dataset more in detail (possibly by `continent`?). Hence, before starting with the good stuff (`ggplot2`), we can get a table of the categorical variable `continent`.
+Function `boxplot()` provides "not so cool" side-by-side boxplots, unlike `ggplot2`. Although, we can see that as time goes by the spread gets larger and larger. This suggests that there might be differences in `gdpPercap`, if we explore the dataset more in detail (possibly by `continent`?). Hence, before starting with the good stuff (`ggplot2`), we can get a table of the categorical variable `continent` for single occurences.
 
 ```{r}
-table(gapminder$continent)
+gapminder %>% group_by(continent) %>% summarize(n = n_distinct(country))
 ```
 
 Note that the number of countries per `continent` is highly variable, which might require a further plotting analysis in `gdpPercap`. This analysis will require tools provided by package `dplyr`.
@@ -119,35 +118,44 @@ time.gdp.continent
 The aesthetics don't seem entirely appropriate. Thus, we will use the following code to fix up the axes, titles and legend:
 
 ```{r}
-time.gdp.continent <- time.gdp.continent + theme(legend.position = "bottom")
-time.gdp.continent <- time.gdp.continent + theme(axis.text.x = element_text(size = 10),
-                                                 axis.text.y = element_text(size = 10),
-                                                 axis.title = element_text(size = 11, face = "bold"),
-                                                 plot.title = element_text(size = 13, face = "bold"))
-time.gdp.continent <- time.gdp.continent + scale_y_continuous(breaks = seq(0, 120000, 10000)) 
+time.gdp.continent <- time.gdp.continent + theme(legend.position = "bottom") + 
+  theme(axis.text.x = element_text(size = 10),
+        axis.text.y = element_text(size = 10),
+        axis.title = element_text(size = 11, face = "bold"),
+        plot.title = element_text(size = 13, face = "bold")) + 
+  scale_y_continuous(breaks = seq(0, 120000, 10000)) 
 time.gdp.continent
 ```
 
 Now, we add annual means in the form of lines with points per year with `stat_summary()`:
 
 ```{r}
-time.gdp.continent <- time.gdp.continent + stat_summary(fun.y = mean, geom = "line", aes(group = factor(continent), colour = factor(continent))) 
-time.gdp.continent <- time.gdp.continent + stat_summary(fun.y = mean, geom = "point",  aes(group = factor(continent), colour = factor(continent)))
+time.gdp.continent <- time.gdp.continent + stat_summary(fun.y = mean, geom = "line", aes(group = factor(continent), colour = factor(continent))) + 
+  stat_summary(fun.y = mean, geom = "point",  aes(group = factor(continent), colour = factor(continent)))
 time.gdp.continent
 ```
 
 We still need to fix up the legends and colours with the following code:
 
 ```{r}
-time.gdp.continent <- time.gdp.continent + labs(shape = "continent", colour = "continent")
-################################
-# Character vectors for colors
 boxplot_colors <- c("mediumorchid1", "coral2", "firebrick1", "springgreen", "cornflowerblue")
 line_colors <- c("mediumorchid4", "coral4", "red4", "springgreen4", "darkblue")
-################################
-time.gdp.continent <- time.gdp.continent + scale_fill_manual(values = boxplot_colors) + scale_color_manual(values = line_colors)
+ time.gdp.continent <- time.gdp.continent + labs(shape = "continent", colour = "continent") + 
+   scale_fill_manual(values = boxplot_colors) + scale_color_manual(values = line_colors)
 time.gdp.continent
 ```
 
-Finally, the plot looks nice and shows us that the continent with the lowest GDP's over time is Africa, despite it is composed of 624 countries. Compared to 360 European countries, the differences are concerning.
+Finally, the plot looks nice and shows us that the continent with the lowest GDP's over time is Africa, despite it's composed of 52 countries. Compared to 30 European countries, and their higher values, the differences are concerning.
+
+With the use of `dplyr`, we can go further by focusing our analysis on a single continent. Let's use the information related to the Americas, and create a subset called `Americas`.
+
+```{r}
+Americas <- filter(gapminder, continent == "Americas")
+```
+
+What if we're interested in the evolution of the `gdpPercap` of countries involved in certain trade agreements in the Americas? For instance, what has been the `gdpPercap` evolution before and after **NAFTA** and **MERCOSUR** for their country members?
+
+In the case of **NAFTA**, the agreement came into force in 1994 and the founding countries are the United States, Canada, and Mexico. For **MERCOSUR**, the agreement came into force in 1991 and the founding countries are Argentina, Brazil, Paraguay, and Uruguay.
+
+
 
