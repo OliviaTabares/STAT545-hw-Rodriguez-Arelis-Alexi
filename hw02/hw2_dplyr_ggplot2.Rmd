@@ -12,7 +12,6 @@ First of all, we need to load the corresponding libraries.
 ```{r}
 suppressPackageStartupMessages(library(tidyverse))
 suppressPackageStartupMessages(library(gapminder))
-knitr::opts_chunk$set(fig.width = 8, fig.height = 6)
 ```
 
 ## Smell Test the Data
