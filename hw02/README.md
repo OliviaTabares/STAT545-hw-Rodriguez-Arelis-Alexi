@@ -1,7 +1,7 @@
 # STAT545-hw02-Rodriguez-Arelis-Alexi
 # Homework 02: Explore `Gapminder` and use `dplyr`
 
-This is the folder corresponding to for Homework 2.
+This is the folder corresponding to Homework 2.
 
 ### Links
 
