@@ -9,9 +9,9 @@ Loading Libraries
 First of all, we need to load the corresponding libraries.
 
 ``` r
-suppressPackageStartupMessages(library(tidyverse))  # The tidyverse contains ggplot2!
+suppressPackageStartupMessages(library(tidyverse))
 suppressPackageStartupMessages(library(gapminder))
-knitr::opts_chunk$set(fig.width=4, fig.height=3)
+knitr::opts_chunk$set(fig.width = 8, fig.height = 6)
 ```
 
 Smell Test the Data
@@ -67,7 +67,7 @@ dim(gapminder)
 
     ## [1] 1704    6
 
-Function `dim` provides the number of rows and columns in a single vector.
+Function `dim` provides the number of rows and columns on a single vector.
 
 *6. What data type is each variable?*
 
@@ -112,7 +112,7 @@ boxplot(gdpPercap ~ year, data = gapminder, main = "Global Evolution of Gross Do
 
 ![](hw2_dplyr_ggplot2_files/figure-markdown_github-ascii_identifiers/unnamed-chunk-9-1.png)
 
-Function `boxplot()` provides "not so cool" side-by-side boxplots, unlike `ggplot2`. Although, we can see that as time goes by the spread gets larger and larger. This suggests that there might be differences in `gdpPercap`, if we explore the dataset more in detail (possibly by `continent`?). Hence, before starting with the good stuff (`ggplot2`), we can get a table of the categorical variable `continent` for single occurences.
+Function `boxplot()` provides "not so cool" side-by-side boxplots, unlike `ggplot2`. Although, we can see that the spread gets larger and larger as time goes by. This suggests that there might be differences in `gdpPercap`, if we explore the dataset more in detail (possibly by `continent`?). Hence, before starting with the good stuff (`ggplot2`), we can get a table of the categorical variable `continent` for single occurences.
 
 ``` r
 gapminder %>% group_by(continent) %>% summarize(n = n_distinct(country))
@@ -127,12 +127,12 @@ gapminder %>% group_by(continent) %>% summarize(n = n_distinct(country))
     ## 4    Europe    30
     ## 5   Oceania     2
 
-Note that the number of countries per `continent` is highly variable, which might require a further plotting analysis in `gdpPercap`. This analysis will require tools provided by package `dplyr`.
+Note that the number of countries per `continent` is highly variable, which might require a further plotting analysis in `gdpPercap`.
 
 Explore Various Plot Types
 --------------------------
 
-`ggplot2` offers useful plotting tools that allow us to get a better sense on how our dataset is behaving. Variable `gdpPercap` can be plotted in different ways, while subsetting our data with `dplyr`. We can start out with a time series depicting side-by-side boxplots per continent (since, we already plotted a global time series in the previous section), as well as the corresponding annual means in the form of line with points per year.
+`ggplot2` offers useful plotting tools that allow us to get a better sense on how our dataset is behaving. Variable `gdpPercap` can be plotted in different ways, while subsetting our data with `dplyr`. We can start out with a time series depicting side-by-side boxplots per continent (since we already plotted a global time series in the previous section), as well as the corresponding annual means in the form of lines with points per year.
 
 ``` r
 time.gdp.continent <- ggplot(gapminder, aes(x = as.factor(year), y = gdpPercap)) + xlab ("Year") + ylab("GDP per Capita") + ggtitle("Continent Time Series of GDP per Capita")
@@ -141,7 +141,7 @@ time.gdp.continent
 
 ![](hw2_dplyr_ggplot2_files/figure-markdown_github-ascii_identifiers/unnamed-chunk-11-1.png)
 
-The first layer doesn't containt any plots yet, it only sets up the plotting field. Now, we will add the side-by-side continent boxplots in a yearly time series. Note we're using `as.factor(year)` in order to change this integer variable into a factor.
+The first layer doesn't containt any plots yet, it only sets up the plotting field. Now, we will add the side-by-side continent boxplots on a yearly time series. Note we're using `as.factor(year)` in order to change this integer variable into a factor.
 
 ``` r
 time.gdp.continent <- time.gdp.continent + geom_boxplot(aes(fill = continent))
@@ -158,7 +158,7 @@ time.gdp.continent <- time.gdp.continent + theme(legend.position = "bottom") +
         axis.text.y = element_text(size = 10),
         axis.title = element_text(size = 11, face = "bold"),
         plot.title = element_text(size = 13, face = "bold")) + 
-  scale_y_continuous(breaks = seq(0, 120000, 10000)) 
+  scale_y_continuous(breaks = seq(0, max(gapminder$gdpPercap), 10000)) 
 time.gdp.continent
 ```
 
@@ -186,7 +186,7 @@ time.gdp.continent
 
 ![](hw2_dplyr_ggplot2_files/figure-markdown_github-ascii_identifiers/unnamed-chunk-15-1.png)
 
-Finally, the plot looks nice and shows us that the continent with the lowest GDP's over time is Africa, despite it's composed of 52 countries. Compared to 30 European countries, and their higher values, the differences are concerning.
+Finally, the plot looks nice and shows us that the continent with the lowest GDP's per capita over time is Africa, despite it's composed of 52 countries. Compared to the 30 European countries, and their higher values, the differences are concerning.
 
 With the use of `dplyr`, we can go further by focusing our analysis on a single continent. Let's use the information related to the Americas, and create a subset called `Americas`.
 
@@ -261,8 +261,6 @@ trade.agreements
     ##  9 Argentina  1992  9308.419  MERCOSUR
     ## 10 Argentina  1997 10967.282  MERCOSUR
     ## # ... with 74 more rows
-
-The dataset `trade.agreements` can be used for plotting the corresponding time series. Note we're facetting by `Agreement`.
 
 We need to reorder the factor levels for `country`, so the plot will be more understanble in terms of the legend.
 
@@ -343,7 +341,7 @@ levels(trade.agreements$country)
     ## [139] "West Bank and Gaza"       "Yemen, Rep."             
     ## [141] "Zambia"                   "Zimbabwe"
 
-We can see that `trade.agreements$country` still has the original factor levels from `gapminder$country`. So, we use the function `droplevels()`.
+We can see that `trade.agreements$country` still has the original factor levels from `gapminder$country`. So, we use the function `droplevels()` to get rid of those unused levels.
 
 ``` r
 trade.agreements$country <- droplevels(trade.agreements$country)
@@ -353,7 +351,7 @@ levels(trade.agreements$country)
     ## [1] "Argentina"     "Brazil"        "Canada"        "Mexico"       
     ## [5] "Paraguay"      "United States" "Uruguay"
 
-Now that we dropped the unused factor levels, we can set up a new level order. Firstly, the **MERCOSUR** group, and secondly, the **NAFTA** group. We use function `factor()`.
+Now that we dropped the unused factor levels, we can set up a new level order. Firstly, the **MERCOSUR** group, and secondly, the **NAFTA** group. We use the function `factor()`.
 
 ``` r
 trade.agreements$country <- factor(trade.agreements$country, 
@@ -365,7 +363,7 @@ levels(trade.agreements$country)
     ## [1] "Argentina"     "Brazil"        "Paraguay"      "Uruguay"      
     ## [5] "Canada"        "Mexico"        "United States"
 
-The plot can't be a boxplot since we only have a single observation per `year` and `country`. Thus, we're plotting lines with points.
+Finally, the dataset `trade.agreements` can be used for plotting the corresponding time series. The plot can't be a boxplot since we only have a single observation per `year` and `country`. Thus, we're plotting lines with points. Note we're facetting by `Agreement`.
 
 ``` r
 line_colors.2 <- c("mediumorchid4", "coral4", 
@@ -392,7 +390,7 @@ time.gdp.continent
 
 ![](hw2_dplyr_ggplot2_files/figure-markdown_github-ascii_identifiers/unnamed-chunk-22-1.png)
 
-It seems that the plot is done. However, we can make it even nicer by adding vertical lines indicating the year where the trade agreements came into force (1991 for **MERCOSUR**, and 1994 for **NAFTA**). We need to create a dummy data frame called `dummy.df` that matches the respective `Agreement` levels.
+It seems that the plot is completely done. However, we can make it even nicer by adding vertical lines indicating the year where the trade agreements came into force (1991 for **MERCOSUR**, and 1994 for **NAFTA**). We need to create a dummy data frame called `dummy.df` that matches the respective `Agreement` levels.
 
 ``` r
 dummy.df <- data.frame(Agreement = c("MERCOSUR", "NAFTA"), X = c(1991, 1994))
@@ -401,7 +399,7 @@ time.gdp.continent + geom_vline(data = dummy.df, aes(xintercept = X))
 
 ![](hw2_dplyr_ggplot2_files/figure-markdown_github-ascii_identifiers/unnamed-chunk-23-1.png)
 
-Note that both lines fall into the respective enforcement years. From this plot, after **NAFTA** was enforced, we can see that the largest impact on `gdpPercap` was on Canada and the United States unlike the rest of the Latin American countries.
+Note that both lines fall into the respective enforcement years. From this plot, after **NAFTA** was enforced, we can see that the largest impact on `gdpPercap` was on Canada and the United States unlike the rest of the Latin American countries. The difference is even more concerning for those countries that are part of **MERCOSUR**
 
 But I want to do more!
 ----------------------
