@@ -5,8 +5,8 @@ This is the folder corresponding to Homework 2.
 
 ### Links
 
-- [Link to the `md` file for Gapminder exploration.](hw2_dplyr_ggplot2.md)
-- [Link to the `Rmd` file for Gapminder exploration.](hw2_dplyr_ggplot2.Rmd)
+- [Link to the `md` file for Gapminder exploration and use `dplyr`.](hw2_dplyr_ggplot2.md)
+- [Link to the `Rmd` file for Gapminder exploration and use `dplyr`.](hw2_dplyr_ggplot2.Rmd)
 
 ### Reflections on the GitHub Workflow and R Markdown
 
