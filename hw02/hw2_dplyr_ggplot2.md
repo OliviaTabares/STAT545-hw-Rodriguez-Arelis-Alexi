@@ -11,6 +11,7 @@ First of all, we need to load the corresponding libraries.
 ``` r
 suppressPackageStartupMessages(library(tidyverse))
 suppressPackageStartupMessages(library(gapminder))
+knitr::opts_chunk$set(fig.width=8, fig.height=5)
 ```
 
 Smell Test the Data
@@ -111,7 +112,7 @@ boxplot(gdpPercap ~ year, data = gapminder, main = "Global Evolution of Gross Do
 
 ![](hw2_dplyr_ggplot2_files/figure-markdown_github-ascii_identifiers/unnamed-chunk-9-1.png)
 
-Function `boxplot()` provides "not so cool" side-by-side boxplots, unlike `ggplot2`. Although, we can see that the spread gets larger and larger as time goes by. This suggests that there might be differences in `gdpPercap`, if we explore the dataset more in detail (possibly by `continent`?). Hence, before starting with the good stuff (`ggplot2`), we can get a table of the categorical variable `continent` for single occurences.
+Function `boxplot()` provides "not so cool" side-by-side boxplots, unlike `ggplot2`. Although, we can see that the spread gets larger and larger as time goes by. This suggests that there might be differences in `gdpPercap`, if we explore the dataset more in detail (possibly by `continent`?). Hence, before starting with the good stuff (`ggplot2`), we can get a table of the categorical variable `continent` for single occurrences.
 
 ``` r
 gapminder %>% group_by(continent) %>% summarize(n = n_distinct(country))
