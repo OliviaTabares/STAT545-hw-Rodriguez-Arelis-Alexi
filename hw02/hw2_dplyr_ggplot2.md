@@ -3,31 +3,16 @@ HW2- Explore Gapminder and use dplyr
 Alexi Rodriguez-Arelis
 25/9/2017
 
-``` r
-knitr::opts_chunk$set(echo = TRUE)
-```
-
 Loading Libraries
 -----------------
 
 First of all, we need to load the corresponding libraries.
 
 ``` r
-library(gapminder)
-library(tidyverse)
+suppressPackageStartupMessages(library(tidyverse))  # The tidyverse contains ggplot2!
+suppressPackageStartupMessages(library(gapminder))
+knitr::opts_chunk$set(fig.width=4, fig.height=3)
 ```
-
-    ## Loading tidyverse: ggplot2
-    ## Loading tidyverse: tibble
-    ## Loading tidyverse: tidyr
-    ## Loading tidyverse: readr
-    ## Loading tidyverse: purrr
-    ## Loading tidyverse: dplyr
-
-    ## Conflicts with tidy packages ----------------------------------------------
-
-    ## filter(): dplyr, stats
-    ## lag():    dplyr, stats
 
 Smell Test the Data
 -------------------
@@ -182,8 +167,8 @@ time.gdp.continent
 Now, we add annual means in the form of lines with points per year with `stat_summary()`:
 
 ``` r
-time.gdp.continent <- time.gdp.continent + stat_summary(fun.y = mean, geom = "line", aes(group = factor(continent), colour = factor(continent))) + 
-  stat_summary(fun.y = mean, geom = "point",  aes(group = factor(continent), colour = factor(continent)))
+time.gdp.continent <- time.gdp.continent + stat_summary(fun.y = mean, geom = "line", aes(group = continent, colour = continent)) + 
+  stat_summary(fun.y = mean, geom = "point",  aes(group = continent, colour = continent))
 time.gdp.continent
 ```
 
@@ -194,7 +179,7 @@ We still need to fix up the legends and colours with the following code:
 ``` r
 boxplot_colors <- c("mediumorchid1", "coral2", "firebrick1", "springgreen", "cornflowerblue")
 line_colors <- c("mediumorchid4", "coral4", "red4", "springgreen4", "darkblue")
- time.gdp.continent <- time.gdp.continent + labs(shape = "continent", colour = "continent") + 
+time.gdp.continent <- time.gdp.continent + labs(shape = "continent", colour = "continent") + 
    scale_fill_manual(values = boxplot_colors) + scale_color_manual(values = line_colors)
 time.gdp.continent
 ```
@@ -207,8 +192,275 @@ With the use of `dplyr`, we can go further by focusing our analysis on a single 
 
 ``` r
 Americas <- filter(gapminder, continent == "Americas")
+Americas
 ```
+
+    ## # A tibble: 300 x 6
+    ##      country continent  year lifeExp      pop gdpPercap
+    ##       <fctr>    <fctr> <int>   <dbl>    <int>     <dbl>
+    ##  1 Argentina  Americas  1952  62.485 17876956  5911.315
+    ##  2 Argentina  Americas  1957  64.399 19610538  6856.856
+    ##  3 Argentina  Americas  1962  65.142 21283783  7133.166
+    ##  4 Argentina  Americas  1967  65.634 22934225  8052.953
+    ##  5 Argentina  Americas  1972  67.065 24779799  9443.039
+    ##  6 Argentina  Americas  1977  68.481 26983828 10079.027
+    ##  7 Argentina  Americas  1982  69.942 29341374  8997.897
+    ##  8 Argentina  Americas  1987  70.774 31620918  9139.671
+    ##  9 Argentina  Americas  1992  71.868 33958947  9308.419
+    ## 10 Argentina  Americas  1997  73.275 36203463 10967.282
+    ## # ... with 290 more rows
 
 What if we're interested in the evolution of the `gdpPercap` of countries involved in certain trade agreements in the Americas? For instance, what has been the `gdpPercap` evolution before and after **NAFTA** and **MERCOSUR** for their country members?
 
 In the case of **NAFTA**, the agreement came into force in 1994 and the founding countries are the United States, Canada, and Mexico. For **MERCOSUR**, the agreement came into force in 1991 and the founding countries are Argentina, Brazil, Paraguay, and Uruguay.
+
+From the dataset `Americas`, we're going to extract those 7 countries in a new dataset called `trade.agreements` and select the `country`, `year`, and `gdpPercap` columns:
+
+``` r
+trade.agreements <- Americas %>% 
+  filter(country %in% c("United States", "Canada", "Mexico", 
+                          "Argentina", "Brazil", "Paraguay", "Uruguay")) %>%
+  select(country, year, gdpPercap)
+trade.agreements 
+```
+
+    ## # A tibble: 84 x 3
+    ##      country  year gdpPercap
+    ##       <fctr> <int>     <dbl>
+    ##  1 Argentina  1952  5911.315
+    ##  2 Argentina  1957  6856.856
+    ##  3 Argentina  1962  7133.166
+    ##  4 Argentina  1967  8052.953
+    ##  5 Argentina  1972  9443.039
+    ##  6 Argentina  1977 10079.027
+    ##  7 Argentina  1982  8997.897
+    ##  8 Argentina  1987  9139.671
+    ##  9 Argentina  1992  9308.419
+    ## 10 Argentina  1997 10967.282
+    ## # ... with 74 more rows
+
+Now, we have to create additional column indicating what trade agreement the country belongs to (`Agreement`):
+
+``` r
+trade.agreements <- trade.agreements %>% 
+  mutate(Agreement = if_else(country %in% c("United States", "Canada", "Mexico"), "NAFTA", "MERCOSUR"))
+trade.agreements
+```
+
+    ## # A tibble: 84 x 4
+    ##      country  year gdpPercap Agreement
+    ##       <fctr> <int>     <dbl>     <chr>
+    ##  1 Argentina  1952  5911.315  MERCOSUR
+    ##  2 Argentina  1957  6856.856  MERCOSUR
+    ##  3 Argentina  1962  7133.166  MERCOSUR
+    ##  4 Argentina  1967  8052.953  MERCOSUR
+    ##  5 Argentina  1972  9443.039  MERCOSUR
+    ##  6 Argentina  1977 10079.027  MERCOSUR
+    ##  7 Argentina  1982  8997.897  MERCOSUR
+    ##  8 Argentina  1987  9139.671  MERCOSUR
+    ##  9 Argentina  1992  9308.419  MERCOSUR
+    ## 10 Argentina  1997 10967.282  MERCOSUR
+    ## # ... with 74 more rows
+
+The dataset `trade.agreements` can be used for plotting the corresponding time series. Note we're facetting by `Agreement`.
+
+We need to reorder the factor levels for `country`, so the plot will be more understanble in terms of the legend.
+
+``` r
+# Checking current level order
+levels(trade.agreements$country) 
+```
+
+    ##   [1] "Afghanistan"              "Albania"                 
+    ##   [3] "Algeria"                  "Angola"                  
+    ##   [5] "Argentina"                "Australia"               
+    ##   [7] "Austria"                  "Bahrain"                 
+    ##   [9] "Bangladesh"               "Belgium"                 
+    ##  [11] "Benin"                    "Bolivia"                 
+    ##  [13] "Bosnia and Herzegovina"   "Botswana"                
+    ##  [15] "Brazil"                   "Bulgaria"                
+    ##  [17] "Burkina Faso"             "Burundi"                 
+    ##  [19] "Cambodia"                 "Cameroon"                
+    ##  [21] "Canada"                   "Central African Republic"
+    ##  [23] "Chad"                     "Chile"                   
+    ##  [25] "China"                    "Colombia"                
+    ##  [27] "Comoros"                  "Congo, Dem. Rep."        
+    ##  [29] "Congo, Rep."              "Costa Rica"              
+    ##  [31] "Cote d'Ivoire"            "Croatia"                 
+    ##  [33] "Cuba"                     "Czech Republic"          
+    ##  [35] "Denmark"                  "Djibouti"                
+    ##  [37] "Dominican Republic"       "Ecuador"                 
+    ##  [39] "Egypt"                    "El Salvador"             
+    ##  [41] "Equatorial Guinea"        "Eritrea"                 
+    ##  [43] "Ethiopia"                 "Finland"                 
+    ##  [45] "France"                   "Gabon"                   
+    ##  [47] "Gambia"                   "Germany"                 
+    ##  [49] "Ghana"                    "Greece"                  
+    ##  [51] "Guatemala"                "Guinea"                  
+    ##  [53] "Guinea-Bissau"            "Haiti"                   
+    ##  [55] "Honduras"                 "Hong Kong, China"        
+    ##  [57] "Hungary"                  "Iceland"                 
+    ##  [59] "India"                    "Indonesia"               
+    ##  [61] "Iran"                     "Iraq"                    
+    ##  [63] "Ireland"                  "Israel"                  
+    ##  [65] "Italy"                    "Jamaica"                 
+    ##  [67] "Japan"                    "Jordan"                  
+    ##  [69] "Kenya"                    "Korea, Dem. Rep."        
+    ##  [71] "Korea, Rep."              "Kuwait"                  
+    ##  [73] "Lebanon"                  "Lesotho"                 
+    ##  [75] "Liberia"                  "Libya"                   
+    ##  [77] "Madagascar"               "Malawi"                  
+    ##  [79] "Malaysia"                 "Mali"                    
+    ##  [81] "Mauritania"               "Mauritius"               
+    ##  [83] "Mexico"                   "Mongolia"                
+    ##  [85] "Montenegro"               "Morocco"                 
+    ##  [87] "Mozambique"               "Myanmar"                 
+    ##  [89] "Namibia"                  "Nepal"                   
+    ##  [91] "Netherlands"              "New Zealand"             
+    ##  [93] "Nicaragua"                "Niger"                   
+    ##  [95] "Nigeria"                  "Norway"                  
+    ##  [97] "Oman"                     "Pakistan"                
+    ##  [99] "Panama"                   "Paraguay"                
+    ## [101] "Peru"                     "Philippines"             
+    ## [103] "Poland"                   "Portugal"                
+    ## [105] "Puerto Rico"              "Reunion"                 
+    ## [107] "Romania"                  "Rwanda"                  
+    ## [109] "Sao Tome and Principe"    "Saudi Arabia"            
+    ## [111] "Senegal"                  "Serbia"                  
+    ## [113] "Sierra Leone"             "Singapore"               
+    ## [115] "Slovak Republic"          "Slovenia"                
+    ## [117] "Somalia"                  "South Africa"            
+    ## [119] "Spain"                    "Sri Lanka"               
+    ## [121] "Sudan"                    "Swaziland"               
+    ## [123] "Sweden"                   "Switzerland"             
+    ## [125] "Syria"                    "Taiwan"                  
+    ## [127] "Tanzania"                 "Thailand"                
+    ## [129] "Togo"                     "Trinidad and Tobago"     
+    ## [131] "Tunisia"                  "Turkey"                  
+    ## [133] "Uganda"                   "United Kingdom"          
+    ## [135] "United States"            "Uruguay"                 
+    ## [137] "Venezuela"                "Vietnam"                 
+    ## [139] "West Bank and Gaza"       "Yemen, Rep."             
+    ## [141] "Zambia"                   "Zimbabwe"
+
+We can see that `trade.agreements$country` still has the original factor levels from `gapminder$country`. So, we use the function `droplevels()`.
+
+``` r
+trade.agreements$country <- droplevels(trade.agreements$country)
+levels(trade.agreements$country)
+```
+
+    ## [1] "Argentina"     "Brazil"        "Canada"        "Mexico"       
+    ## [5] "Paraguay"      "United States" "Uruguay"
+
+Now that we dropped the unused factor levels, we can set up a new level order. Firstly, the **MERCOSUR** group, and secondly, the **NAFTA** group. We use function `factor()`.
+
+``` r
+trade.agreements$country <- factor(trade.agreements$country, 
+                                   levels = c("Argentina", "Brazil", "Paraguay", "Uruguay",
+                                              "Canada", "Mexico", "United States"))
+levels(trade.agreements$country)
+```
+
+    ## [1] "Argentina"     "Brazil"        "Paraguay"      "Uruguay"      
+    ## [5] "Canada"        "Mexico"        "United States"
+
+The plot can't be a boxplot since we only have a single observation per `year` and `country`. Thus, we're plotting lines with points.
+
+``` r
+line_colors.2 <- c("mediumorchid4", "coral4", 
+                   "red4", "springgreen4", 
+                   "darkblue", "mistyrose4", "orange3")
+time.gdp.continent <- ggplot(trade.agreements, aes(x = year, y = gdpPercap)) + 
+  xlab ("Year") + 
+  ylab("GDP per Capita") + 
+  scale_x_continuous(breaks = seq(min(trade.agreements$year), max(trade.agreements$year), 5)) +
+  facet_grid(~ Agreement) +
+  ggtitle("Time Series of GDP per Capita in NAFTA and MERCOSUR") +
+  geom_point(aes(colour = country, shape = country)) +
+  geom_line(aes(group = country, colour = country)) +
+  theme(legend.position = "bottom") + 
+  theme(axis.text.x = element_text(size = 10, angle = 45),
+        axis.text.y = element_text(size = 10),
+        axis.title = element_text(size = 11, face = "bold"),
+        plot.title = element_text(size = 13, face = "bold"),
+        strip.text.x = element_text(size = 11, face = "bold")) + 
+  labs(shape = "country", colour = "country") + scale_color_manual(values = line_colors.2) +
+  scale_shape_manual(values = 1:length(line_colors.2))
+time.gdp.continent
+```
+
+![](hw2_dplyr_ggplot2_files/figure-markdown_github-ascii_identifiers/unnamed-chunk-22-1.png)
+
+It seems that the plot is done. However, we can make it even nicer by adding vertical lines indicating the year where the trade agreements came into force (1991 for **MERCOSUR**, and 1994 for **NAFTA**). We need to create a dummy data frame called `dummy.df` that matches the respective `Agreement` levels.
+
+``` r
+dummy.df <- data.frame(Agreement = c("MERCOSUR", "NAFTA"), X = c(1991, 1994))
+time.gdp.continent + geom_vline(data = dummy.df, aes(xintercept = X))
+```
+
+![](hw2_dplyr_ggplot2_files/figure-markdown_github-ascii_identifiers/unnamed-chunk-23-1.png)
+
+Note that both lines fall into the respective enforcement years. From this plot, after **NAFTA** was enforced, we can see that the largest impact on `gdpPercap` was on Canada and the United States unlike the rest of the Latin American countries.
+
+But I want to do more!
+----------------------
+
+*Evaluate this code and describe the result. Presumably the analyst’s intent was to get the data for Rwanda and Afghanistan. Did they succeed? Why or why not? If not, what is the correct way to do this?*
+
+``` r
+filter(gapminder, country == c("Rwanda", "Afghanistan"))
+```
+
+    ## # A tibble: 12 x 6
+    ##        country continent  year lifeExp      pop gdpPercap
+    ##         <fctr>    <fctr> <int>   <dbl>    <int>     <dbl>
+    ##  1 Afghanistan      Asia  1957  30.332  9240934  820.8530
+    ##  2 Afghanistan      Asia  1967  34.020 11537966  836.1971
+    ##  3 Afghanistan      Asia  1977  38.438 14880372  786.1134
+    ##  4 Afghanistan      Asia  1987  40.822 13867957  852.3959
+    ##  5 Afghanistan      Asia  1997  41.763 22227415  635.3414
+    ##  6 Afghanistan      Asia  2007  43.828 31889923  974.5803
+    ##  7      Rwanda    Africa  1952  40.000  2534927  493.3239
+    ##  8      Rwanda    Africa  1962  43.000  3051242  597.4731
+    ##  9      Rwanda    Africa  1972  44.600  3992121  590.5807
+    ## 10      Rwanda    Africa  1982  46.218  5507565  881.5706
+    ## 11      Rwanda    Africa  1992  23.599  7290203  737.0686
+    ## 12      Rwanda    Africa  2002  43.413  7852401  785.6538
+
+In the case of Afganistan, the analyst isn't getting all the records beginning 1952. The condition `country == c("Rwanda", "Afghanistan")` isn't correct for the analyst's purpose.
+
+``` r
+head(gapminder)
+```
+
+    ## # A tibble: 6 x 6
+    ##       country continent  year lifeExp      pop gdpPercap
+    ##        <fctr>    <fctr> <int>   <dbl>    <int>     <dbl>
+    ## 1 Afghanistan      Asia  1952  28.801  8425333  779.4453
+    ## 2 Afghanistan      Asia  1957  30.332  9240934  820.8530
+    ## 3 Afghanistan      Asia  1962  31.997 10267083  853.1007
+    ## 4 Afghanistan      Asia  1967  34.020 11537966  836.1971
+    ## 5 Afghanistan      Asia  1972  36.088 13079460  739.9811
+    ## 6 Afghanistan      Asia  1977  38.438 14880372  786.1134
+
+The correct way is replacing `==` with `%in%`:
+
+``` r
+filter(gapminder, country %in% c("Rwanda", "Afghanistan"))
+```
+
+    ## # A tibble: 24 x 6
+    ##        country continent  year lifeExp      pop gdpPercap
+    ##         <fctr>    <fctr> <int>   <dbl>    <int>     <dbl>
+    ##  1 Afghanistan      Asia  1952  28.801  8425333  779.4453
+    ##  2 Afghanistan      Asia  1957  30.332  9240934  820.8530
+    ##  3 Afghanistan      Asia  1962  31.997 10267083  853.1007
+    ##  4 Afghanistan      Asia  1967  34.020 11537966  836.1971
+    ##  5 Afghanistan      Asia  1972  36.088 13079460  739.9811
+    ##  6 Afghanistan      Asia  1977  38.438 14880372  786.1134
+    ##  7 Afghanistan      Asia  1982  39.854 12881816  978.0114
+    ##  8 Afghanistan      Asia  1987  40.822 13867957  852.3959
+    ##  9 Afghanistan      Asia  1992  41.674 16317921  649.3414
+    ## 10 Afghanistan      Asia  1997  41.763 22227415  635.3414
+    ## # ... with 14 more rows
