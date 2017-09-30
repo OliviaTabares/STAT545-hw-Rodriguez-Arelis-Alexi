@@ -1,7 +1,7 @@
-HW2- Explore `Gapminder` and use `dplyr`
+HW3- Use `dplyr` to manipulate and explore data (also use `ggplot2`)
 ================
 Alexi Rodriguez-Arelis
-25/9/2017
+29/9/2017
 
 Loading Libraries
 -----------------
@@ -110,7 +110,7 @@ Function `summary()` provides the range of this quantitative variable, as well a
 boxplot(gdpPercap ~ year, data = gapminder, main = "Global Evolution of Gross Domestic Product over Time \n", xlab = "Year", ylab = "Gross Domestic Product per Capita")
 ```
 
-![](hw2_dplyr_ggplot2_files/figure-markdown_github-ascii_identifiers/unnamed-chunk-9-1.png)
+![](hw3_dplyr_ggplot2_files/figure-markdown_github-ascii_identifiers/unnamed-chunk-9-1.png)
 
 Function `boxplot()` provides "not so cool" side-by-side boxplots, unlike `ggplot2`. Although, we can see that the spread gets larger and larger as time goes by. This suggests that there might be differences in `gdpPercap`, if we explore the dataset more in detail (possibly by `continent`?). Hence, before starting with the good stuff (`ggplot2`), we can get a table of the categorical variable `continent` for single occurrences.
 
@@ -139,7 +139,7 @@ time.gdp.continent <- ggplot(gapminder, aes(x = as.factor(year), y = gdpPercap))
 time.gdp.continent
 ```
 
-![](hw2_dplyr_ggplot2_files/figure-markdown_github-ascii_identifiers/unnamed-chunk-11-1.png)
+![](hw3_dplyr_ggplot2_files/figure-markdown_github-ascii_identifiers/unnamed-chunk-11-1.png)
 
 The first layer doesn't containt any plots yet, it only sets up the plotting field. Now, we will add the side-by-side continent boxplots on a yearly time series. Note we're using `as.factor(year)` in order to change this integer variable into a factor.
 
@@ -148,7 +148,7 @@ time.gdp.continent <- time.gdp.continent + geom_boxplot(aes(fill = continent))
 time.gdp.continent
 ```
 
-![](hw2_dplyr_ggplot2_files/figure-markdown_github-ascii_identifiers/unnamed-chunk-12-1.png)
+![](hw3_dplyr_ggplot2_files/figure-markdown_github-ascii_identifiers/unnamed-chunk-12-1.png)
 
 The aesthetics don't seem entirely appropriate. Thus, we will use the following code to fix up the axes, titles and legend:
 
@@ -162,7 +162,7 @@ time.gdp.continent <- time.gdp.continent + theme(legend.position = "bottom") +
 time.gdp.continent
 ```
 
-![](hw2_dplyr_ggplot2_files/figure-markdown_github-ascii_identifiers/unnamed-chunk-13-1.png)
+![](hw3_dplyr_ggplot2_files/figure-markdown_github-ascii_identifiers/unnamed-chunk-13-1.png)
 
 Now, we add annual means in the form of lines with points per year with `stat_summary()`:
 
@@ -172,7 +172,7 @@ time.gdp.continent <- time.gdp.continent + stat_summary(fun.y = mean, geom = "li
 time.gdp.continent
 ```
 
-![](hw2_dplyr_ggplot2_files/figure-markdown_github-ascii_identifiers/unnamed-chunk-14-1.png)
+![](hw3_dplyr_ggplot2_files/figure-markdown_github-ascii_identifiers/unnamed-chunk-14-1.png)
 
 We still need to fix up the legends and colours with the following code:
 
@@ -184,7 +184,7 @@ time.gdp.continent <- time.gdp.continent + labs(shape = "continent", colour = "c
 time.gdp.continent
 ```
 
-![](hw2_dplyr_ggplot2_files/figure-markdown_github-ascii_identifiers/unnamed-chunk-15-1.png)
+![](hw3_dplyr_ggplot2_files/figure-markdown_github-ascii_identifiers/unnamed-chunk-15-1.png)
 
 Finally, the plot looks nice and shows us that the continent with the lowest GDP's per capita over time is Africa, despite it's composed of 52 countries. Compared to the 30 European countries, and their higher values, the differences are concerning.
 
@@ -388,7 +388,7 @@ time.gdp.continent <- ggplot(trade.agreements, aes(x = year, y = gdpPercap)) +
 time.gdp.continent
 ```
 
-![](hw2_dplyr_ggplot2_files/figure-markdown_github-ascii_identifiers/unnamed-chunk-22-1.png)
+![](hw3_dplyr_ggplot2_files/figure-markdown_github-ascii_identifiers/unnamed-chunk-22-1.png)
 
 It seems that the plot is completely done. However, we can make it even nicer by adding vertical lines indicating the year where the trade agreements came into force (1991 for **MERCOSUR**, and 1994 for **NAFTA**). We need to create a dummy data frame called `dummy.df` that matches the respective `Agreement` levels.
 
@@ -397,7 +397,7 @@ dummy.df <- data.frame(Agreement = c("MERCOSUR", "NAFTA"), X = c(1991, 1994))
 time.gdp.continent + geom_vline(data = dummy.df, aes(xintercept = X))
 ```
 
-![](hw2_dplyr_ggplot2_files/figure-markdown_github-ascii_identifiers/unnamed-chunk-23-1.png)
+![](hw3_dplyr_ggplot2_files/figure-markdown_github-ascii_identifiers/unnamed-chunk-23-1.png)
 
 Note that both lines fall into the respective enforcement years. From this plot, after **NAFTA** was enforced, we can see that the largest impact on `gdpPercap` was on Canada and the United States unlike the rest of the Latin American countries. The difference is even more concerning for those countries that are part of **MERCOSUR**
 
