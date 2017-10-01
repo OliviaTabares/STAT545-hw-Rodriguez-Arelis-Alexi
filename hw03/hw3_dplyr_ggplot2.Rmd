@@ -12,244 +12,87 @@ First of all, we need to load the corresponding libraries.
 ```{r}
 suppressPackageStartupMessages(library(tidyverse))
 suppressPackageStartupMessages(library(gapminder))
-knitr::opts_chunk$set(fig.width=8, fig.height=5)
+knitr::opts_chunk$set(fig.width = 8, fig.height = 5)
 ```
 
-## Smell Test the Data
+## Tasks
 
-Now, we proceed with the primary dataset exploration.
+### *1. Get the maximum and minimum of GDP per capita for all continents.*
 
-*1. Is it a data.frame, a matrix, a vector, a list?*
+The task doesn't specify whether they should be a global maximum and minimum GDP per capita (timeless) or not. Since I'm feeling inspired, I'll create a time series with the maximum and minimum per continent in order to check how the gap evolves in each continent over time. That sounds exciting!
+
+I need to create a grouped table by `continent` **and** `year` with `group_by()`, along with `summarize()` using functions `min()` and `max()`.
 
 ```{r}
-typeof(gapminder)
+task_1_table <- gapminder %>%
+  group_by(continent, year) %>% 
+  summarize(Minimum = min(gdpPercap), Maximum = max(gdpPercap))
 ```
 
-Using function `typeof()`, we can see that `gapminder` is a `list`.
+This produces the following table:
 
-*2. What’s its class?*
-
-```{r}
-class(gapminder)
+```{r results = 'asis'}
+knitr::kable(task_1_table)
 ```
 
-Function `class()` tells us that `gapminder` is a `tibble`, a class of `data.frame`.
-
-*3. How many variables/columns?*
+Using `task_1_table`, we can plot the `Minimum` and `Maximum` in a time series:
 
 ```{r}
-ncol(gapminder)
+task_1_plot <- ggplot(task_1_table, aes(x = year)) +
+  xlab ("Year") + ylab("GDP per Capita") + 
+  scale_x_continuous(breaks = seq(min(task_1_table$year), max(task_1_table$year), 5)) +
+  ggtitle("Time Series of Minimum and Maximum GDP per Capita\n per Continent") +
+  geom_line(aes(y = Minimum, colour = "Minimum")) +
+  geom_line(aes(y = Maximum, colour = "Maximum")) +
+  geom_point(aes(y = Minimum, colour = "Minimum")) + 
+  geom_point(aes(y = Maximum, colour = "Maximum")) +
+  theme(legend.position = "bottom") + 
+  facet_grid(~ continent) +
+  theme(axis.text.x = element_text(size = 7, angle = 90),
+        axis.text.y = element_text(size = 10),
+        axis.title = element_text(size = 11, face = "bold"),
+        plot.title = element_text(size = 13, face = "bold"),
+        strip.text.x = element_text(size = 11, face = "bold")) +
+  theme(legend.title = element_blank()) +
+  scale_y_continuous(breaks = seq(0, max(gapminder$gdpPercap), 10000)) 
+task_1_plot
 ```
 
-With `ncol()` we can get the number of columns or variables, 6.
+Before analizing the plot, note the following:
 
-*4. How many rows/observations?*
-
-```{r}
-nrow(gapminder)
+```{r results = 'asis'}
+countries_per_continent <- gapminder %>% group_by(continent) %>% summarize(Number = n_distinct(country))
+knitr::kable(countries_per_continent)
 ```
 
-With `nrow()` we can get the number of rows or observations, 1704.
+Oceania has 2 countries in the dataset, and its gap is narrow over the years even though it gets wider at the end of the series. This suggests that inequality between these two countries is not that serious. However, when it comes to the Americas and Europe, inequality gets larger over time which is concerning. In terms of Africa, we can see that the gap is not large but the figures for the maximum are pretty small when compared to other continents.
 
-*5. Can you get these facts about “extent” or “size” in more than one way? Can you imagine different functions being useful in different contexts?*
+### *2. Look at the spread of GDP per capita within the continents.*
 
-```{r}
-dim(gapminder)
+In order to this, we can start by extracting the corresponding information from `gapminder`:
+
+```{r results = 'asis'}
+task_2_table <- select(gapminder, continent, country, year, gdpPercap)
+knitr::kable(task_2_table[1:20,])
 ```
 
-Function `dim` provides the number of rows and columns on a single vector.
-
-*6. What data type is each variable?*
+I'm just displaying the first 20 rows of `task_2_table` since I'm selecting `continent`, `country`, `year`, and `gdpPercap` from the 1704 records in `gapminder`. Again, I'm interested in a time series per `continent`, so I'll create side-by-side boxplots in order to compare the spread in the data.
 
 ```{r}
-str(gapminder)
-```
-
-The 6 variables are described as follows:
-
-* `country`: A factor with 142 levels (all countries in `gapminder`).
-* `continent`: A factor with 5 levels (continents of the world, except Antarctica).
-* `year`: A factor providing the years of the respective figures.
-* `lifeExp`: A decimal value in years of life expectancy per `country` and `year`.
-* `pop`: An integer value of the population per `country` and `year`.
-* `gdpPercap`: A decimal value of the gross domestic product per capita, per `country` and `year`.
-
-## Explore Individual Variables
-
-In terms of the quantitative variable, we pick `gdpPercap`.
-
-```{r}
-summary(gapminder$gdpPercap)
-```
-
-Function `summary()` provides the range of this quantitative variable, as well as the respective measures of spread. If we want to plot the corresponding information in a suitable way, we could use side-by-side boxplots. Furthermore, we can also take into account the variable `year` in order to track the evolution over time. Note that we aren't providing a detailed analysis (yet!).
-
-```{r}
-boxplot(gdpPercap ~ year, data = gapminder, main = "Global Evolution of Gross Domestic Product over Time \n", xlab = "Year", ylab = "Gross Domestic Product per Capita")
-```
-
-Function `boxplot()` provides "not so cool" side-by-side boxplots, unlike `ggplot2`. Although, we can see that the spread gets larger and larger as time goes by. This suggests that there might be differences in `gdpPercap`, if we explore the dataset more in detail (possibly by `continent`?). Hence, before starting with the good stuff (`ggplot2`), we can get a table of the categorical variable `continent` for single occurrences.
-
-```{r}
-gapminder %>% group_by(continent) %>% summarize(n = n_distinct(country))
-```
-
-Note that the number of countries per `continent` is highly variable, which might require a further plotting analysis in `gdpPercap`.
-
-## Explore Various Plot Types
-
-`ggplot2` offers useful plotting tools that allow us to get a better sense on how our dataset is behaving. Variable `gdpPercap` can be plotted in different ways, while subsetting our data with `dplyr`. We can start out with a time series depicting side-by-side boxplots per continent (since we already plotted a global time series in the previous section), as well as the corresponding annual means in the form of lines with points per year. 
-
-```{r}
-time.gdp.continent <- ggplot(gapminder, aes(x = as.factor(year), y = gdpPercap)) + xlab ("Year") + ylab("GDP per Capita") + ggtitle("Continent Time Series of GDP per Capita")
-time.gdp.continent
-```
-
-The first layer doesn't containt any plots yet, it only sets up the plotting field. Now, we will add the side-by-side continent boxplots on a yearly time series. Note we're using `as.factor(year)` in order to change this integer variable into a factor.  
-
-```{r}
-time.gdp.continent <- time.gdp.continent + geom_boxplot(aes(fill = continent))
-time.gdp.continent
-```
-
-The aesthetics don't seem entirely appropriate. Thus, we will use the following code to fix up the axes, titles and legend:
-
-```{r}
-time.gdp.continent <- time.gdp.continent + theme(legend.position = "bottom") + 
+task_2_plot <-  ggplot(task_2_table, aes(x = as.factor(year), y = gdpPercap)) + 
+  xlab ("Year") + ylab("GDP per Capita") + 
+  ggtitle("Continent Time Series of GDP per Capita") +
+  geom_boxplot(aes(fill = continent)) +
+  theme(legend.position = "bottom") + 
   theme(axis.text.x = element_text(size = 10),
         axis.text.y = element_text(size = 10),
         axis.title = element_text(size = 11, face = "bold"),
         plot.title = element_text(size = 13, face = "bold")) + 
-  scale_y_continuous(breaks = seq(0, max(gapminder$gdpPercap), 10000)) 
-time.gdp.continent
+  scale_y_continuous(breaks = seq(0, max(gapminder$gdpPercap), 10000))
+task_2_plot
 ```
 
-Now, we add annual means in the form of lines with points per year with `stat_summary()`:
-
-```{r}
-time.gdp.continent <- time.gdp.continent + stat_summary(fun.y = mean, geom = "line", aes(group = continent, colour = continent)) + 
-  stat_summary(fun.y = mean, geom = "point",  aes(group = continent, colour = continent))
-time.gdp.continent
-```
-
-We still need to fix up the legends and colours with the following code:
-
-```{r}
-boxplot_colors <- c("mediumorchid1", "coral2", "firebrick1", "springgreen", "cornflowerblue")
-line_colors <- c("mediumorchid4", "coral4", "red4", "springgreen4", "darkblue")
-time.gdp.continent <- time.gdp.continent + labs(shape = "continent", colour = "continent") + 
-   scale_fill_manual(values = boxplot_colors) + scale_color_manual(values = line_colors)
-time.gdp.continent
-```
-
-Finally, the plot looks nice and shows us that the continent with the lowest GDP's per capita over time is Africa, despite it's composed of 52 countries. Compared to the 30 European countries, and their higher values, the differences are concerning.
-
-With the use of `dplyr`, we can go further by focusing our analysis on a single continent. Let's use the information related to the Americas, and create a subset called `Americas`.
-
-```{r}
-Americas <- filter(gapminder, continent == "Americas")
-Americas
-```
-
-What if we're interested in the evolution of the `gdpPercap` of countries involved in certain trade agreements in the Americas? For instance, what has been the `gdpPercap` evolution before and after **NAFTA** and **MERCOSUR** for their country members?
-
-In the case of **NAFTA**, the agreement came into force in 1994 and the founding countries are the United States, Canada, and Mexico. For **MERCOSUR**, the agreement came into force in 1991 and the founding countries are Argentina, Brazil, Paraguay, and Uruguay.
-
-From the dataset `Americas`, we're going to extract those 7 countries in a new dataset called `trade.agreements` and select the `country`, `year`, and `gdpPercap` columns:
-
-```{r}
-trade.agreements <- Americas %>% 
-  filter(country %in% c("United States", "Canada", "Mexico", 
-                          "Argentina", "Brazil", "Paraguay", "Uruguay")) %>%
-  select(country, year, gdpPercap)
-trade.agreements 
-```
-
-Now, we have to create additional column indicating what trade agreement the country belongs to (`Agreement`):
-
-```{r}
-trade.agreements <- trade.agreements %>% 
-  mutate(Agreement = if_else(country %in% c("United States", "Canada", "Mexico"), "NAFTA", "MERCOSUR"))
-trade.agreements
-```
-
-We need to reorder the factor levels for `country`, so the plot will be more understanble in terms of the legend.
-
-```{r}
-# Checking current level order
-levels(trade.agreements$country) 
-```
-
-We can see that `trade.agreements$country` still has the original factor levels from `gapminder$country`. So, we use the function `droplevels()` to get rid of those unused levels.
-
-```{r}
-trade.agreements$country <- droplevels(trade.agreements$country)
-levels(trade.agreements$country)
-```
-
-Now that we dropped the unused factor levels, we can set up a new level order. Firstly, the **MERCOSUR** group, and secondly, the **NAFTA** group. We use the function `factor()`.
-
-```{r}
-trade.agreements$country <- factor(trade.agreements$country, 
-                                   levels = c("Argentina", "Brazil", "Paraguay", "Uruguay",
-                                              "Canada", "Mexico", "United States"))
-levels(trade.agreements$country)
-```
-
-Finally, the dataset `trade.agreements` can be used for plotting the corresponding time series. The plot can't be a boxplot since we only have a single observation per `year` and `country`. Thus, we're plotting lines with points. Note we're facetting by `Agreement`. 
-
-```{r}
-line_colors.2 <- c("mediumorchid4", "coral4", 
-                   "red4", "springgreen4", 
-                   "darkblue", "mistyrose4", "orange3")
-time.gdp.continent <- ggplot(trade.agreements, aes(x = year, y = gdpPercap)) + 
-  xlab ("Year") + 
-  ylab("GDP per Capita") + 
-  scale_x_continuous(breaks = seq(min(trade.agreements$year), max(trade.agreements$year), 5)) +
-  facet_grid(~ Agreement) +
-  ggtitle("Time Series of GDP per Capita in NAFTA and MERCOSUR") +
-  geom_point(aes(colour = country, shape = country)) +
-  geom_line(aes(group = country, colour = country)) +
-  theme(legend.position = "bottom") + 
-  theme(axis.text.x = element_text(size = 10, angle = 45),
-        axis.text.y = element_text(size = 10),
-        axis.title = element_text(size = 11, face = "bold"),
-        plot.title = element_text(size = 13, face = "bold"),
-        strip.text.x = element_text(size = 11, face = "bold")) + 
-  labs(shape = "country", colour = "country") + scale_color_manual(values = line_colors.2) +
-  scale_shape_manual(values = 1:length(line_colors.2))
-time.gdp.continent
-```
-
-It seems that the plot is completely done. However, we can make it even nicer by adding vertical lines indicating the year where the trade agreements came into force (1991 for **MERCOSUR**, and 1994 for **NAFTA**). We need to create a dummy data frame called `dummy.df` that matches the respective `Agreement` levels.
-
-```{r}
-dummy.df <- data.frame(Agreement = c("MERCOSUR", "NAFTA"), X = c(1991, 1994))
-time.gdp.continent + geom_vline(data = dummy.df, aes(xintercept = X))
-```
-
-Note that both lines fall into the respective enforcement years. From this plot, after **NAFTA** was enforced, we can see that the largest impact on `gdpPercap` was on Canada and the United States unlike the rest of the Latin American countries. The difference is even more concerning for those countries that are part of **MERCOSUR**
-
-## But I want to do more!
-
-*Evaluate this code and describe the result. Presumably the analyst’s intent was to get the data for Rwanda and Afghanistan. Did they succeed? Why or why not? If not, what is the correct way to do this?*
-
-```{r}
-filter(gapminder, country == c("Rwanda", "Afghanistan"))
-```
-
-In the case of Afganistan, the analyst isn't getting all the records beginning 1952. The condition `country == c("Rwanda", "Afghanistan")` isn't correct for the analyst's purpose.
-
-```{r}
-head(gapminder)
-```
-
-The correct way is replacing `==` with `%in%`:
-
-```{r}
-filter(gapminder, country %in% c("Rwanda", "Afghanistan"))
-```
-
+In terms of Africa, even though it has really small values compared to other continents, the spread doesn't grow too much over time. On the other hand, continents like Asia and Europe, present evident disparities that grow significantly over time. The Americas has a poor evolution on this metric but the spread doesn't grow too much over time.
 
 
 
