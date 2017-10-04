@@ -140,7 +140,7 @@ knitr::kable(gapminder %>% group_by(continent) %>% summarize(Number = n_distinct
 
 Oceania has 2 countries in the dataset, and its `gdpPercap` gap is narrow over the years even though it gets wider at the end of the series. This suggests that inequality between these two countries is not that serious. However, when it comes to the Americas and Europe, inequality gets larger over time which is concerning. In terms of Africa, we can see that the gap is not large but the figures for the maximum are pretty small when compared to other continents.
 
-When it comes to the maximum `gdpPercap`, the upward trend in the Americas, Europe and Oceania follows a logical pattern over time. However, why does Asian present such abnormal behaviour? Is it a certain country responsible of this situation? Our subset `task_1_table` doesn't contain the country with the maximum `gdpPercap`. Hence, we can get it by creating the following subset from `gapminder`:
+When it comes to the maximum `gdpPercap`, the upward trend in the Americas, Europe and Oceania follows a logical pattern over time. However, why does Asia present such abnormal behaviour? Is it a certain country responsible of this situation? Our subset `task_1_table` doesn't contain the country with the maximum `gdpPercap`. Hence, we can get it by creating the following subset from `gapminder`:
 
 ``` r
 task_1_table_Asia <- filter(gapminder, continent == "Asia") %>%
@@ -166,7 +166,7 @@ knitr::kable(task_1_table_Asia)
 |  2002| Singapore    |   36023.11|
 |  2007| Kuwait       |   47306.99|
 
-Note that the countries that present these unusual values for `gdpPercap` are Kuwait (1952-1977, 1987-1997, and 2007) as well as Saudi Arabia (1982). I'm pretty sure this is oil-related, but we will need further data in roder to confirm this.
+Note that the countries presenting these unusual values for `gdpPercap` are Kuwait (1952-1977, 1987-1997, and 2007) as well as Saudi Arabia (1982). I'm pretty sure this is oil-related, but we will need further data in order to confirm this.
 
 ### *2. Look at the spread of GDP per capita within the continents.*
 
@@ -317,7 +317,7 @@ task_3_plot
 
 ![](hw3_dplyr_ggplot2_files/figure-markdown_github-ascii_identifiers/unnamed-chunk-10-1.png)
 
-We don't need to modifiy the scale of the y-axis in this plot since `ggplot2()` automatically adapts it to our current range of values (pretty convenient!). The evolution of the African life expectancy over time seems promising from 1952 to 1987, but it stops its upward trend beginning 1987 until 2007 (there must be a reason why this is happening, and we will need further data in order to find it out). Note the significant gap in 2007 between Africa (a rough average of 55 years) versus Oceania with its two countries (a rough average close to 80 years). We can say that the other three continents in 2007 (Europe, the Americas and Asia) have acceptable average life expectancies above 70 years in that same year.
+We don't need to modify the scale of the y-axis in this plot since `ggplot2()` automatically adapts it to our current range of values (pretty convenient!). The evolution of the African life expectancy over time seems promising from 1952 to 1987, but it stops its upward trend beginning 1987 (there must be a reason why this is happening, and we will need further data in order to find it out). Note the significant gap in 2007 between Africa (a rough average of 55 years) versus Oceania with its two countries (a rough average close to 80 years). We can say that the other three continents in 2007 (Europe, the Americas and Asia) have acceptable average life expectancies above 70 years in that same year.
 
 ### *4. Report the absolute and/or relative abundance of countries with low life expectancy over time by continent: Compute some measure of worldwide life expectancy – you decide – a mean or median or some other quantile or perhaps your current age. Then determine how many countries on each continent have a life expectancy less than this benchmark, for each year.*
 
@@ -370,7 +370,7 @@ knitr::kable(task_4_table[1:20,])
 | Europe    | Albania     |  1982|   70.420|
 | Europe    | Albania     |  1992|   71.581|
 
-The previous table only shows the first 20 rows of subset `task_4_table`. We can get summary tables that count down the number of countries by `year` and `continent` in the following way in column `Number`:
+The previous table only shows the first 20 rows of subset `task_4_table`. We can get summary tables that count down the number of countries by `year` and `continent` in the following way with column `Number`:
 
 ``` r
 task_4_table_country_freq <- task_4_table %>% 
@@ -437,7 +437,7 @@ knitr::kable(task_4_table_country_freq)
 |  2007| Americas  |       8|        11.3|
 |  2007| Europe    |       1|         1.4|
 
-Our previous table arranges the single occcurrences by `year` in ascending order, where `continent` is nested in descending order. Furthermore, column `Percentage` depicts the percentage of countries that each `continent` has per `year` in a descending order. The information contained in this table is not easy to read since we have a significant number of rows. However, roughly speaking, Africa and Asia always have the highest percentages oc countries every year. A stacked bar chart of these percetages per `year` and `continent` will be more illustrative using `task_4_table_country_freq`:
+Our previous table arranges the single occcurrences by `year` in ascending order, where `continent` is nested in descending order. Furthermore, column `Percentage` depicts the percentage of countries that each `continent` has per `year` in a descending order. The information contained in this table is not easy to read since we have a significant number of rows. However, roughly speaking, Africa and Asia always have the highest percentages of countries every year. A stacked bar chart of these percetages per `year` and `continent` will be more illustrative, using `task_4_table_country_freq`:
 
 ``` r
 # Changing the order in continent levels
@@ -462,7 +462,7 @@ task_4_plot
 
 ![](hw3_dplyr_ggplot2_files/figure-markdown_github-ascii_identifiers/unnamed-chunk-15-1.png)
 
-Note we flipped the axis with `coord_flip()`, and reversed the labels in the legend with `guides(fill = guide_legend(reverse = TRUE))`. The plot shows us that Africa has been increasing its number of countries that are below the life expectancy of 71.9355 years over the years, unlike the rest of the continents. But now, how are all these life expectancies behaving over time? What is their respective spread by continent? What about the means? We can make side-by-side plots with `task_4_table`:
+Note we flipped the axis with `coord_flip()`, and reversed the labels in the legend with `guides(fill = guide_legend(reverse = TRUE))`. The plot shows us that Africa has been increasing its number of countries that are below the life expectancy of 71.9355 years over the years, unlike the rest of the continents. But now, how are all these life expectancies behaving over time? What is their respective spread by continent? We can make side-by-side plots with `task_4_table`:
 
 ``` r
 task_4_plot_2 <- ggplot(task_4_table, aes(x = as.factor(year), y = lifeExp)) + 
@@ -480,4 +480,4 @@ task_4_plot_2
 
 ![](hw3_dplyr_ggplot2_files/figure-markdown_github-ascii_identifiers/unnamed-chunk-16-1.png)
 
-The magenta line indicates the threshold of 71.9355 years. We can see that the gap in European medians gets narrower over the years until 2007, as well as in the Americas. This narrowing trend is followed by Asia and Africa during the first years until 1997. Note that the values for the African counties are really below the thresholf, even in 2007, which is concerning.
+The magenta line indicates the threshold of 71.9355 years. We can see that the gap in European medians gets narrower over the years until 2007, as well as in the Americas. This narrowing trend is followed by Asia and Africa during the first years until 1997. Note that the values for the African counties are really below the threshold, even in 2007, which is concerning.
