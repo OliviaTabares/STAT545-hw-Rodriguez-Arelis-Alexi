@@ -19,6 +19,10 @@ The following sections provide the respective links to the `README.md` files for
 
 - [Link to the `README.MD` file.](hw03/README.md)
 
+### Homework 4
+
+- [Link to the `README.MD` file.](hw04/README.md)
+
 Cheers,
 
 Alexi :)
