@@ -12,9 +12,51 @@ First of all, we need to load the corresponding libraries.
 ```{r}
 suppressPackageStartupMessages(library(tidyverse))
 suppressPackageStartupMessages(library(gapminder))
+suppressPackageStartupMessages(library(reshape2))
+suppressPackageStartupMessages(library(dplyr))
 knitr::opts_chunk$set(fig.width = 8, fig.height = 5)
 ```
 
 ## Tasks
 
-### *1. Get the maximum and minimum of GDP per capita for all continents.*
+### **1. General data reshaping and relationship to aggregation.**
+
+I'm picking **Activity 2** : *Make a tibble with one row per year and columns for life expectancy for two or more countries.*
+
+Let's take a look at our raw data:
+
+```{r}
+knitr::kable(head(gapminder))
+knitr::kable(tail(gapminder))
+```
+
+From `gapminder`, I'm subsetting countries Mexico and United States (since I'm interested in plotting `lifeExp` between my country and our neighbours from the States). From library `reshape2()`, I'm using function `spread()` to create two columns for both countries while keeping `year` as rows.
+
+```{r}
+activity_2 <- gapminder %>%
+  filter(country %in% c("Mexico", "United States")) %>%
+  select(country, year, lifeExp) %>%
+  spread(key = country, value = lifeExp)
+knitr::kable(activity_2)
+```
+
+Now, we make a scatterplot of life expectancy for Mexico versus the United States as follows:
+
+```{r}
+# Renaming contry columns
+names(activity_2)[3] <- "USA"
+ggplot(activity_2, aes(x = Mexico, y = USA)) + geom_smooth(method = 'lm', se = FALSE) + 
+  geom_point(aes(colour = year)) + 
+  scale_colour_gradient(low = "orange", high = "red") +
+  scale_x_continuous(breaks = seq(50, 80, 5)) +
+  scale_y_continuous(breaks = seq(50, 80, 5)) +
+  coord_cartesian(xlim = c(50, 80), ylim = c(50, 80)) +
+  theme(axis.text.x = element_text(size = 10),
+        axis.text.y = element_text(size = 10),
+        axis.title = element_text(size = 11, face = "bold"),
+        plot.title = element_text(size = 13, face = "bold")) +
+  ggtitle("Life Expectancy of Mexico versus the United States\n from 1952 to 2007")
+```
+
+We added a color gradient by year with `scale_colour_gradient()`, as well as a regression line with `geom_smooth()` which seems having a good fit for our data points. Note we force the y-axis to have the same scale as the x-axis with `coord_cartesian()`, since the the data spread in Mexico across the years is larger than in the United States. From this plot, we can see that Mexico has greatly improved its life expetancy to the point it gets closer to the United States during the 2000's.
+
